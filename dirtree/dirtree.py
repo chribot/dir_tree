@@ -62,7 +62,9 @@ def get_dir_dict(path: str) -> dict:
         files = []
         dir_names = []
         for d in scan:
-            if d.name[0] != '.': # ignore .git, .vscode, ...
+            if (d.name[0] == '.') & ignore_dot_files:
+                break
+            else:
                 if d.is_dir(): dir_names.append(d.name)
                 else: files.append(d.name)
         files.sort()
@@ -105,18 +107,14 @@ def get_dir_dict(path: str) -> dict:
 }
 '''
 
+ignore_dot_files = True
+
 print()
 path = os.getcwd()
 #path = '..'
 #path = os.path.abspath(path)
 #path = os.path.relpath(path)
 
-#path += '/three dirs/no files'
-#path += '/three dirs/one file'
-#path += '/three dirs/one dir'
-#path += '/two dirs'
-#path += '/three dirs'
 dict_dir = get_dir_dict(path)
-#print(dict_dir)
 print_tree(dict_dir)
 print()
