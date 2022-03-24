@@ -1,27 +1,58 @@
 import os
-import sys
 
-def print_file(file_name: str, depth: int, is_last_file: bool = False):
+def print_file(file_name: str, lines_before: str, is_last_file: bool = False):
     if is_last_file:
-        print( depth * '│ ' + '└──', file_name )
+        print( lines_before + '└──', file_name )
     else:
-        print( depth * '│ ' + '├──', file_name )
+        print( lines_before + '├──', file_name )
 
-def print_dir(dir_name: str, depth: int):
-    if depth == 0: print(dir_name + '/')
+def print_root_dir(dir_name: str):
+    print(dir_name + '/')
+
+def print_dir(dir_name: str, lines_before: str, is_last: bool = False):
+    if is_last: print( lines_before + '└──', dir_name + '/' )
+    else:       print( lines_before + '├──', dir_name + '/' )
+
+def print_tree( dir_dict: dict, 
+                    lines_before: str = None, 
+                    is_last_dir: bool = False):
+    # depth of dirtree
+    depth = 0
+    if lines_before != None:
+        if lines_before == '': depth = 1
+        else: depth = len(lines_before)//2 + 1
+    
+    # print current directory
+    if depth == 0:
+        print_root_dir(dir_dict['dir_name'])
+        lines_before = ''
     else:
-        x = depth-1
-        print( x * '│ ' + '├──', dir_name + '/' )
+        print_dir(dir_dict['dir_name'], lines_before, is_last_dir)
 
-def print_tree(dir_dict: dict, depth: int = 0):
-    """Prints our Directory data structure, which is a dict."""
-    print_dir(dir_dict['dir_name'], depth)
-    for d in dir_dict['dir_list']:
-        print_tree(d, depth+1)                                      # Rekursion
-    for i, f in enumerate(dir_dict['file_list']):
-        if i == len(dir_dict['file_list']) - 1: is_last_file = True
+    count_dirs = len(dir_dict['dir_list'])      # dirs in current dir
+    count_files = len(dir_dict['file_list'])    # files in current dir
+
+    # print subdirs
+    for i, d in enumerate(dir_dict['dir_list']):
+        line = ''
+        if (i == count_dirs-1) & (count_files == 0):
+            d_is_last = True                    # subdirectory has no files
+        else: d_is_last = False
+        if depth >= 1:
+            if is_last_dir: line += '  '        # parent directory has no files
+            else: line += '│ '                  # parent directory has files
+        print_tree(d, lines_before + line, d_is_last)
+
+    # print files
+    for i, d in enumerate(dir_dict['file_list']):
+        line = ''
+        if depth >= 1:
+            if is_last_dir: line += '  '        # parent directory has no files
+            else: line += '│ '                  # parent directory has files
+        if (i == count_files-1): 
+            is_last_file = True                 # last file in directory
         else: is_last_file = False
-        print_file(f, depth, is_last_file)
+        print_file(d, lines_before + line, is_last_file)
 
 def get_dir_dict(path: str) -> dict:
     """Returns a Directory-Tree of a given Directory (path) as Dictionary."""
@@ -80,6 +111,11 @@ path = os.getcwd()
 #path = os.path.abspath(path)
 #path = os.path.relpath(path)
 
+#path += '/three dirs/no files'
+#path += '/three dirs/one file'
+#path += '/three dirs/one dir'
+#path += '/two dirs'
+#path += '/three dirs'
 dict_dir = get_dir_dict(path)
 #print(dict_dir)
 print_tree(dict_dir)
