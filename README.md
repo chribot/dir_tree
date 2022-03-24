@@ -3,12 +3,10 @@ Dir Tree ist ein Kommandozeilen Programm, das einen Verzeichnisbaum erstellt.
 
 ```
 ./dir_tree_project/
-│ 
 ├── dirtree/
 │ ├── dirtree.py
 │ ├── __init__.py
 │ └── cli.py
-│ 
 ├── README.md
 └── tree.py
 ```
@@ -34,5 +32,5 @@ Dir Tree ist ein Kommandozeilen Programm, das einen Verzeichnisbaum erstellt.
 
 - `path` : Pfad zum Verzeichnis
 - `dir_name` : Verzeichnisname
-- `dir_name` : Liste aller Dateien im Verzeichnis
-- `dir_list` : Liste aller Unterverzeichnisse. Ein Unterverzeichnis ist auch vom Typ `dir_dict`
+- `file_list` : Liste aller Dateien im Verzeichnis
+- `dir_list` : Liste aller Unterverzeichnisse im Verzeichnis. Ein Unterverzeichnis ist auch vom Typ `dir_dict`
