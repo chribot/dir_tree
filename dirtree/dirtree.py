@@ -52,6 +52,9 @@ def print_tree( dir_dict: dict,
         print_file(d, lines_before + line, is_last_file)
 
 def get_dir_dict(path: str) -> dict:
+    return _get_dir_dict(path, 0)
+
+def _get_dir_dict(path: str, depth: int) -> dict:
     """Returns a Directory-Tree of a given Directory (path) as Dictionary."""
     if path == '': path = os.getcwd()
     else: path = os.path.abspath(path)
@@ -69,6 +72,9 @@ def get_dir_dict(path: str) -> dict:
                     dir_names.append(d.name)
                 else: files.append(d.name)
         files.sort()
+    
+    if depth > max_depth:
+        files = ['[...]']
 
     if path == '/': dir_name = ''
     else: dir_name = path.split('/')[-2]
@@ -76,9 +82,11 @@ def get_dir_dict(path: str) -> dict:
     dir_list = []
     if dir_names:
         dir_names.sort(key=str.lower)                     # use lower case sort
-        for dn in dir_names:
-            if os.access(path + dn, os.R_OK):           # check read permission
-                dir_list.append( get_dir_dict( path + dn ) )        # recursion
+        if depth <= max_depth:
+            for dn in dir_names:
+                if os.access(path + dn, os.R_OK):       # check read permission
+                    # recursion
+                    dir_list.append( _get_dir_dict( path + dn, depth+1 ) )
 
     dict_dir['path'] = path
     dict_dir['dir_name'] = dir_name
@@ -111,10 +119,11 @@ if __name__ == "__main__":
     '''
 
     ignore_dot_files = True
+    max_depth = 3
 
     print()
     path = os.getcwd()
-    #path = '..'
+    path = '..'
     #path = '/'
 
     dict_dir = get_dir_dict(path)
