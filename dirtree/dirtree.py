@@ -58,7 +58,7 @@ def _get_dir_dict(path: str, depth: int) -> dict:
     """Returns a Directory-Tree of a given Directory (path) as Dictionary."""
     if path == '': path = os.getcwd()
     else: path = os.path.abspath(path)
-    if path[-1] != '/': path += '/'
+    if path[-1] != os.sep: path += os.sep
 
     dict_dir = {}
     with os.scandir(path) as scan:
@@ -77,7 +77,7 @@ def _get_dir_dict(path: str, depth: int) -> dict:
         files = ['[...]']
 
     if path == '/': dir_name = ''
-    else: dir_name = path.split('/')[-2]
+    else: dir_name = path.split(os.sep)[-2]
 
     dir_list = []
     if dir_names:
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     print()
     path = os.getcwd()
-    path = '..'
+    #path = '..'
     #path = '/'
 
     dict_dir = get_dir_dict(path)
