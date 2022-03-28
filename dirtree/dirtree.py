@@ -98,6 +98,7 @@ def _get_dir_dict(path: str, depth: int) -> dict:
 
 # MAIN ------------------------------------------------------------------------
 if __name__ == "__main__":
+    import cli
 
     # data structure for dir_dict:
     '''
@@ -122,7 +123,7 @@ if __name__ == "__main__":
     max_depth = 3
 
     print()
-    path = os.getcwd()
+    path = cli.get_path_from_args()
     #path = '..'
     #path = '/'
 
