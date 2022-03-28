@@ -13,25 +13,23 @@ class DirTree:
         self.__dirtree_list = []
         self.__generate_tree()
 
-    def __generate_tree(self, depth: int = 0) -> None:
+    def __generate_tree(self) -> None:
         if self.__path == '': self.__path = os.getcwd()
         else: self.__path = os.path.abspath(self.__path)
         if self.__path[-1] != os.sep: self.__path += os.sep
 
-        with os.scandir(self.__path) as scan:
-            files = []
+        if self.__max_depth == 0:
+            files = ['[...]']
             dir_names = []
-            for d in scan:
-                if (d.name[0] == '.') & self.__ignore_dot_files:
-                    pass
-                else:
+        else:
+            with os.scandir(self.__path) as scan:
+                files = []
+                dir_names = []
+                for d in scan:
                     if d.is_dir(follow_symlinks=self.__follow_symlinks): 
                         dir_names.append(d.name)
                     else: files.append(d.name)
-            files.sort()
-
-        if depth > self.__max_depth:
-            files = ['[...]']
+                files.sort()
 
         if self.__path == '/': dir_name = ''
         else: dir_name = self.__path.split(os.sep)[-2]
@@ -39,14 +37,17 @@ class DirTree:
         dir_list = []
         if dir_names:
             dir_names.sort(key=str.lower)                 # use lower case sort
-            if depth <= self.__max_depth:
+            if self.__max_depth > 0:
                 for dn in dir_names:
                     # check read permission
                     if os.access(self.__path + dn, os.R_OK):
+                        if (dn[0] == '.') & self.__ignore_dot_files:
+                            max_depth_sub = 0
+                        else: max_depth_sub = self.__max_depth-1
                         # recursion
                         dir_list.append( DirTree( 
                                             self.__path + dn, 
-                                            self.__max_depth-1, 
+                                            max_depth_sub, 
                                             self.__ignore_dot_files ) )
 
         self.__name = dir_name
@@ -87,11 +88,14 @@ class DirTree:
                 if is_last_dir: line += '  '   # parent directory has no files
                 else: line += '│ '             # parent directory has files
             # recursion
-            dirtree_str += self.__get_dirtree_str(
-                                    d, lines_before + line, d_is_last)
+            if (d.get_name()[0] == '.') & self.__ignore_dot_files:
+                pass
+            else:
+                dirtree_str += self.__get_dirtree_str(
+                                        d, lines_before + line, d_is_last)
 
         # files to str
-        for i, d in enumerate(dirtree.__file_list):
+        for i, f in enumerate(dirtree.__file_list):
             line = ''
             if depth >= 1:
                 if is_last_dir: line += '  '    # parent directory has no files
@@ -99,8 +103,11 @@ class DirTree:
             if (i == count_files-1): 
                 is_last_file = True             # last file in directory
             else: is_last_file = False
-            dirtree_str += self.__get_file_str(
-                                    d, lines_before + line, is_last_file)
+            if (f[0] == '.') & self.__ignore_dot_files:
+                pass
+            else:
+                dirtree_str += self.__get_file_str(
+                                        f, lines_before + line, is_last_file)
         return dirtree_str
 
     def __get_dir_str(self, name: str,
@@ -126,9 +133,13 @@ class DirTree:
         if self.__ignore_dot_files != ignore_dot_files:
             self.__ignore_dot_files = ignore_dot_files
             self.__generate_tree()
+    
+    def get_name(self) -> str:
+        return self.__name
 
-# end class DirTree
+# end class DirTree -----------------------------------------------------------
 
+'''
 def print_file(file_name: str, lines_before: str, is_last_file: bool = False):
     if is_last_file: print( lines_before + '└──', file_name )
     else:            print( lines_before + '├──', file_name )
@@ -224,7 +235,7 @@ def _get_dir_dict(path: str, depth: int) -> dict:
 
 ignore_dot_files = True
 max_depth = 3
-
+'''
 
 # MAIN ------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -255,19 +266,23 @@ if __name__ == "__main__":
 
     print()
 
-    #
+    #####################
     # test dir_dict
-    #
+    #####################
+
     #dict_dir = get_dir_dict(path)
     #print_tree(dict_dir)
 
-    #
+    #####################
     # test DirTree class
-    #
+    #####################
+
+    #dirtree = DirTree('.', 3)
+    dirtree = DirTree('.', 2, False)
     #dirtree = DirTree('.', ignore_dot_files = False)
-    dirtree = DirTree(path, 1)
-    print(dirtree)
-    dirtree.set_ignore_dot_files(False)
+    #dirtree = DirTree(path, 1)
+    #print(dirtree)
+    #dirtree.set_ignore_dot_files(False)
     print(dirtree)
 
     print()
