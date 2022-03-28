@@ -43,7 +43,10 @@ class DirTree:
                 for dn in dir_names:
                     if os.access(path + dn, os.R_OK):   # check read permission
                         # recursion
-                        dir_list.append( DirTree( path + dn, depth+1 ) )
+                        dir_list.append( DirTree( 
+                                            path + dn, 
+                                            self.max_depth-1, 
+                                            self.ignore_dot_files ) )
 
         self.path = path
         self.name = dir_name
@@ -68,7 +71,7 @@ class DirTree:
             lines_before = ''
         else:
             #print(self.__get_dir_str(dirtree.name, lines_before, is_last_dir))
-            dirtree_str += self.__get_str(
+            dirtree_str += self.__get_dir_str(
                                     dirtree.name, lines_before, is_last_dir)
 
         count_dirs = len(dirtree.dirtree_list)          # dirs in current dir
@@ -96,14 +99,19 @@ class DirTree:
             if (i == count_files-1): 
                 is_last_file = True             # last file in directory
             else: is_last_file = False
-            dirtree_str += self.__get_str(
+            dirtree_str += self.__get_file_str(
                                     d, lines_before + line, is_last_file)
         return dirtree_str
 
-    def __get_str(self, name: str,
+    def __get_dir_str(self, name: str,
                       lines_before: str, is_last: bool = False) -> str:
         symbol = '└── ' if is_last else '├── '
         return lines_before + symbol + name + '/\n'
+    
+    def __get_file_str(self, name: str,
+                      lines_before: str, is_last: bool = False) -> str:
+        symbol = '└── ' if is_last else '├── '
+        return lines_before + symbol + name + '\n'
 
 # end class DirTree
 
@@ -242,7 +250,8 @@ if __name__ == "__main__":
     #
     # test DirTree class
     #
-    dirtree = DirTree()
+    #dirtree = DirTree('.', ignore_dot_files = False)
+    dirtree = DirTree(path, 1, False)
     print(dirtree)
 
     print()
