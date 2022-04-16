@@ -11,6 +11,9 @@ dir_tree_project/
 └── tree.py
 ```
 
+*Die folgende Datenstruktur ist veraltet und dient nur noch der einfachen Veranschaulichung.*
+*Das dictionary 'dir_dict' wurde durch die Klasse 'DirTree' ersetzt.*
+
 ### Datenstruktur von `dir_dict`:
 ```
 {
